@@ -4,7 +4,7 @@
   occ_val temp_val ac_val heat_val light_val blind_val w_val c_val l_val)
 
 (:init
-    (Is_Occupied occ_val)
+    (Is_Un_Occupied occ_val)
     (Is_Temp_High temp_val)
     (Is_CO2_critical c_val )
     (Is_Light_Bright l_val )

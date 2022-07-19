@@ -1,0 +1,103 @@
+ Occupancy States:
+        Occupied 
+        Unoccupied 
+
+ Seasons:
+        Summer 
+        Winter
+
+ Heat Index:
+        High if T < 30 but T < setpoint( standard)
+        Ideal if T >= setpoint and T >15
+        Cold if T < 15
+        
+
+ Lighting Level:
+        Sunny if Outdoor Lighting > 110 percent of ambient Lighting
+        Ideal if 80 <Outdoor lighting <110 percent of ambient Lighting
+        Gloomy if Outdoor lighting < 80 percent of ambient Lighting
+ 
+ Carbon Dioxide Levels:
+        Alarm if CO2 > 1500 ppm
+        Sub ciritical if 750 ppm < CO2 < 1000 ppm 
+        Normal if  CO2 < 750 ppm 
+
+ Windows:
+        Fully Open
+        Partially Open
+        Closed
+
+ AC:
+        On
+        Off
+
+
+If Season = Summer and Occ_state = Ocuupied.
+
+ Heat Index Control:
+    If Heat Index = Very High, then Heating control = Off, Windows = Fully Open and AC = ON.
+    If Heat Index = High, then Heating control = Off, Windows = Fully Open and AC = OFF.
+    If Heat Index = Ideal, then Heating control = Off, Windows = Partially Open and AC = OFF.
+    If Heat Index = Cold, then Heating control = Medium, Windows = Partially Open and AC = OFF.
+    If Heat Index = Very Cold, then Heating control = High , Windows = Closed and AC = OFF.
+
+ Ventillation Control:
+    If CO2 = Alarm, then Windows = Fully Open and Display Warning.
+    If CO2 = Critical, then Windows =  Fully Open.
+    If CO2 = Sub Critical, then Windows =  Partially Open.
+    If CO2 = Normal, then Windows =  Closed.
+
+Lighting Control:
+    If Lighting = Sunny, then Indoor lights = off, Window Blinds = Open
+    If Lighting = Ideal, then Indoor lights =  off, Window Blinds = Open
+    If Lighting = Gloomy, then Indoor lights =  On, Window Blinds = Open
+
+        def ai_planning(self):
+            action = []
+            occupancy,lighting,heat_index,CO2 = self.context_generator() 
+        #for i in range(self.zones):
+            i = 1
+            out = """(define (problem tempsense) (:domain covisstorage)
+
+        (:objects 
+        occ_val temp_val ac_val heat_val light_val blind_val w_val c_val l_val zone1 zone2 zone3)
+        
+        
+        """
+            out+="""(:init"""
+            out+= occupancy[i-1] + " zone{})".format(i)
+            out+= lighting[i-1] + " zone{})".format(i)
+            out+= heat_index[i-1] + " zone{})".format(i)
+            out+= CO2[i-1] + " zone{})".format(i)
+
+            out+=""")"""
+            out+= """ 
+            """
+            out+="""(:goal (and(or"""
+            out+= "(Heating_Off heat_val zone{})".format(i)
+            out+= "(Heating_High heat_val zone{})".format(i)
+            out+= "(Heating_Medium heat_val zone{}))".format(i)
+            out+= "(or (AC_On ac_val zone{})".format(i)
+            out+= "(AC_Off ac_val zone{}))".format(i)
+            out+= "(or (Window_Closed w_val zone{})".format(i)
+            out+= "(Window_Open w_val zone{})".format(i)
+            out+= "(Window_Mid_Open w_val zone{}))".format(i)
+            out+= "(or (Blind_Closed blind_val zone{})".format(i)
+            out+= "(Blind_Open blind_val zone{}))".format(i)
+            out+= "(or (Lights_On l_val zone{})".format(i)
+            out+= "(Lights_Off l_val zone{})))))".format(i)
+            out+= """       """
+
+            filename = "office_problem"
+            with open(filename, "w") as f:
+                f.write(out)
+
+ 
+
+
+
+
+
+
+
+ 

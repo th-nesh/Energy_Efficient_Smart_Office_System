@@ -1,6 +1,27 @@
+import json
+from datetime import datetime
+from random import random, uniform
+import time
+import math
 import requests
+import paho.mqtt.client as mqtt
+import paho.mqtt.publish as publish
+import pandas as pd
+
+file_path = "/Users/thinesh/Desktop/University/3. Summer 2022/Smart Cities and IoT/Project/Smart_Cities Code/sensor_data.json"
+zone1_df = pd.DataFrame()
+zone2_df = pd.DataFrame()
+with open(file_path, "r") as json_file:
+    for line in json_file.readlines():
+        for key, values in json.loads(line).items():
+            if key == "Zone1":
+                zone1_df = zone1_df.append(values, ignore_index= True)
+            else:
+                zone2_df = zone2_df.append(values,ignore_index= True)
 
 class ai_planner:
+    def __init__(self,zones):
+        self.zones =zones
         
     def CO2_parser(self,x):
         if x>2000:
@@ -31,8 +52,11 @@ class ai_planner:
         else:
             return "(Is_Un_Occupied occ_val)"   
         
-    def context_generator(self, data):
+    def context_generator(self):
         input = [] 
+        data = zone2_df[-1:].to_dict("list")
+
+       
         for key, value in data.items():
             if key == "Zone_CO2":
                 input.append(self.CO2_parser(value[0]))
@@ -44,13 +68,18 @@ class ai_planner:
                 input.append(self.Occupancy_parser(value[0]))
             else:
                 pass
+    
+
+
         return input
             
+        
+       
     # def context_parser(self):
         
-    def ai_planning(self, data):
-            action = []
-            input= self.context_generator(data) 
+    def ai_planning(self):
+            self.action = []
+            input= self.context_generator() 
             print(input)
             print(len(input))
             out = """(define (problem tempsense) (:domain covisstorage)
@@ -90,13 +119,28 @@ class ai_planner:
             domainfile = r"/Users/thinesh/Desktop/University/3. Summer 2022/Smart Cities and IoT/Project/Smart_Cities Code/officedomain.pddl"
             problemfile = r"/Users/thinesh/Desktop/University/3. Summer 2022/Smart Cities and IoT/Project/Smart_Cities Code/officeproblem.pddl"
             data = {'domain': open(domainfile, 'r').read(),
-                        'problem': open(filename, 'r').read()}
+                        'problem': open(problemfile, 'r').read()}
 
             response = requests.post('http://solver.planning.domains/solve', json=data).json()
 
             
             for i in range(0,5):
-                action.append(response["result"]["plan"][i])
+                self.action.append(response["result"]["plan"][i])
                 
-            return action
+            print(self.action)
         
+    def context_parser(self):
+       action = self.action
+       for i in range(len(action)):
+           print(type(action[i]))
+
+
+        
+            
+
+m =ai_planner(2)
+m.ai_planning()
+
+
+
+

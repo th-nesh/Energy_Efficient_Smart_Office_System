@@ -1,6 +1,8 @@
-(define(domain covisstorage)
+;Header and description
 
-     ;remove requirements that are not needed
+(define (domain Smart_Office_domain)
+
+;remove requirements that are not needed
 (:requirements :strips :typing :fluents :negative-preconditions :disjunctive-preconditions)
 
 ; un-comment following line if constants are needed
@@ -31,73 +33,71 @@
     (Blind_Closed ?bc)              ;true iff Window Blind is Closed.
     (Lights_On ?lo)               ;true iff Lights are ON.
     (Lights_Off ?lof)             ;true iff Lights are OFF.
-
     )
 
 ;define actions here
 (:action AC_switched_ON
-    :parameters (?th ?a ?o)
+    :parameters (?th ?ao ?o)
     :precondition (and (Is_Temp_High ?th) (Is_Occupied ?o))
-    :effect (AC_On ?a)  
+    :effect (AC_On ?ao)  
 )
 
 ;define actions here
 (:action AC_switched_OFF
-    :parameters (?ti ?tl ?a ?o ?uo )
+    :parameters (?ti ?tl ?aof ?o ?uo)
     :precondition (or (and (or (Is_Temp_Ideal ?ti) (Is_Temp_Low ?tl)) 
                            (Is_Occupied ?o)) 
                       (Is_Un_Occupied ?uo))
-    :effect (AC_Off ?a)    
+    :effect (AC_Off ?aof)    
 )
 
 ;define actions here
 (:action Heating_to_High
-    :parameters (?h ?tl ?o)
+    :parameters (?hh ?tl ?o)
     :precondition (and (Is_Temp_Low ?tl)(Is_Occupied ?o))
-    :effect (Heating_High ?h)
+    :effect (Heating_High ?hh)
 )
 
 ;define actions here
 (:action Heating_to_Medium
-    :parameters (?h ?ti ?o)
+    :parameters (?hm ?ti ?o)
     :precondition (and (Is_Temp_Ideal ?ti) (Is_Occupied ?o))
-    :effect (Heating_Medium ?h)
+    :effect (Heating_Medium ?hm)
 )
 
 ;define actions here
 (:action Heating_to_Off
-    :parameters (?h ?th ?o ?uo)
+    :parameters (?ho ?th ?o ?uo)
     :precondition (or (and (Is_Temp_High ?th)(Is_Occupied ?o)) (Is_Un_Occupied ?uo))
-    :effect (Heating_Off ?h)
+    :effect (Heating_Off ?ho)
 )
 
 ;define actions here
 (:action Windows_Open
-    :parameters (?w ?o ?cc)
-    :precondition (and
-        (Is_CO2_critical ?cc )
+    :parameters (?wo ?o ?th ?cc)
+    :precondition (and 
+        (Is_CO2_critical ?cc)
         (Is_Occupied ?o)
         )
-    :effect (Window_Open ?w))
+    :effect (Window_Open ?wo))
 
 ;define actions here
 (:action Windows_Partially_Open
-    :parameters (?w  ?cs ?o)
-    :precondition (and 
-        (Is_CO2_sub_critical ?cs)
+    :parameters (?wmo ?ti ?o)
+    :precondition (and (Is_CO2_sub_critical ?cs)
         (Is_Occupied ?o)
         )
-    :effect (Window_Mid_Open ?w)
+    :effect (Window_Mid_Open ?wmo)
 )
 
 ;define actions here
 (:action Windows_Closed
-    :parameters (?w ?o ?cn ?uo)
+    :parameters (?wc ?o ?tl ?cn ?uo)
     :precondition (or (and 
-        (Is_CO2_normal ?cn )
+        (Is_CO2_normal ?cn)
         (Is_Occupied ?o)) (Is_Un_Occupied ?uo)
         )
-    :effect (Window_Closed ?w)
+    :effect (Window_Closed ?wc)
 )
 
 ;define actions here
@@ -105,56 +105,39 @@
 
 ;define actions here
 (:action Blinds_Open
-    :parameters (?b ?o ?lg ?ln ?loi)
+    :parameters (?bo ?o ?lg ?ln)
     :precondition 
-        (or (or (Is_Light_Gloomy ?lg ) (Is_Light_Normal ?ln) ) (Is_Occupied ?o))
+        (and (or (Is_Light_Gloomy ?lg) (Is_Light_Normal ?ln) ) (Is_Occupied ?o))
        
-    :effect (Blind_Open ?b)
+    :effect (Blind_Open ?bo)
 )
 
 ;define actions here
 (:action Blinds_Closed
-    :parameters (?b ?o ?lb ?uo)
+    :parameters (?bc ?o ?lb ?uo)
     :precondition 
         (or (and (Is_Light_Bright ?lb) (Is_Occupied ?o) ) (Is_Un_Occupied ?uo))
        
-    :effect (Blind_Closed ?b)
+    :effect (Blind_Closed ?bc)
 )
 
 ;define actions here
 (:action Lights_On
-    :parameters (?l ?o ?lg ?bo)
+    :parameters (?lo ?o ?lg ?bo)
     :precondition 
-        (and (Is_Light_Gloomy ?lg ) (Blind_Open ?bo)(Is_Occupied ?o))
+        (and (Is_Light_Gloomy ?lg) (Blind_Open ?bo) (Is_Occupied ?o))
        
-    :effect (Lights_On ?l)
+    :effect (Lights_On ?lo)
 )
 
 ;define actions here
 (:action Lights_Off
-    :parameters (?l ?o ?lb  ?ln ?uo)
+    :parameters (?lof ?o ?lb ?uo)
     :precondition 
-        (or (and (or (Is_Light_Normal ?ln)(Is_Light_Bright ?lb))(Is_Occupied ?o) )
+        (or (and (Is_Light_Bright ?lb) (Is_Occupied ?o) )
         (Is_Un_Occupied ?uo) )
        
-    :effect (Lights_Off ?l)
+    :effect (Lights_Off ?lof)
 )
 
 )
-  
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
