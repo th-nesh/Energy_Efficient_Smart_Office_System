@@ -8,8 +8,9 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 #from streamlit_metrics import metric, metric_row
 import plotly.figure_factory as ff
+from streamlit_autorefresh import st_autorefresh
 
-import paho.mqtt.client as mqtt
+count = st_autorefresh(interval=2000, limit=100, key="fizzbuzzcounter")
 file_path1 = "/Users/thinesh/Desktop/University/3. Summer 2022/Smart Cities and IoT/Project/Smart_Cities Code/Workstation/Zone1 Data.json"
 file_path2 = "/Users/thinesh/Desktop/University/3. Summer 2022/Smart Cities and IoT/Project/Smart_Cities Code/Workstation/Zone2 Data.json"
 file_path3 = "/Users/thinesh/Desktop/University/3. Summer 2022/Smart Cities and IoT/Project/Smart_Cities Code/Workstation/Zone3 Data.json"
@@ -19,7 +20,6 @@ zone3_df = pd.DataFrame()
 with open(file_path1, "r") as json_file:
     for line in (json_file.readlines()[-50:]):
         for key, values in json.loads(line).items():
-            print(values)
             zone1_df = zone1_df.append(values, ignore_index= True)
 with open(file_path2, "r") as json_file:
     for line in (json_file.readlines()[-50:]):
@@ -32,7 +32,6 @@ with open(file_path3, "r") as json_file:
             
 original_title = '<p style="font-family:Courier; color:White; font-size: 40px;"> Energy Efficient Smart Office</p>'
 st.markdown(original_title, unsafe_allow_html=True)
-zone1_df = zone2_df
 # Functions for each of the pages
 def data_header(df):
     st.header('Data from the Zone')
@@ -54,18 +53,24 @@ def displaymetric(df):
     
 def interactive_plot(df):
     st.header('Data visualization')
-    plot = px.area(df, x=x_axis_val, y=y_axis_val)
-    st.plotly_chart(plot)
-
+    col1, col2 = st.columns(2)
+    with col1:
+        st.header('Actuator')
+        plot = px.area(df, x=x_axis_val, y=y_axis_act_val)
+        st.plotly_chart(plot)
+    with col2:
+        st.header('Sensor')
+        plot = px.area(df, x=x_axis_val, y=y_axis_sense_val)
+        st.plotly_chart(plot)
 
 col1, col2 = st.columns(2)
 col1.button("Warm-up Mode", key="212",help = "Select to activate Warm-up Mode", on_click= warmup_mode("wc"))
 col2.button("Disable Warm-up Mode", key="121",help = "Select to de-activate Warm-up Mode", on_click= warmup_mode("dwc"))
-col1, col2 = st.columns(2)
+col1, col2,col3 = st.columns(3)
 options = col1.selectbox('Select Zone:', ['Zone 1', 'Zone 2', 'Zone 3'])
 x_axis_val = zone1_df["time_stamp"]
-y_axis_val = col2.selectbox('Select the Y-axis', options=zone1_df.columns)
-  
+y_axis_act_val = col2.selectbox('Select the actuator', options=zone1_df.columns[0:4])
+y_axis_sense_val = col3.selectbox('Select the sensor', options=zone1_df.columns[5:])
 if options == "Zone 1":
     displaymetric(zone1_df)
     interactive_plot(zone1_df)
@@ -79,30 +84,6 @@ else:
     displaymetric(zone3_df)
     interactive_plot(zone3_df)
     data_header(zone3_df)
-
     
-
-
-
-def get_base64(bin_file): 
-    with open(bin_file, 'rb') as f:
-        data = f.read()
-    return base64.b64encode(data).decode()
-
-
-def set_background(png_file):
-    bin_str = get_base64(png_file)
-    page_bg_img = '''
-    <style>
-    .stApp {
-    background-image: url("data:image/png;base64,%s");
-    background-size: cover;
-    }
-    </style>
-    ''' % bin_str
-    st.markdown(page_bg_img, unsafe_allow_html=True)
-
-#set_background("/Users/thinesh/Desktop/University/3. Summer 2022/Smart Cities and IoT/Project/Smart_Cities Code/office-hintergrund-fuer-videokonferenzen_23-2148641674.webp")
-
 
 
