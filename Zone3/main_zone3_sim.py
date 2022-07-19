@@ -60,7 +60,7 @@ while True:
         # heater.actuate(action[3])
         # ac.actuate(action[4])
         actuation= {"Light": action [0], "Blind": action [1], "Window": action[2], "Heater": action [3], "AC" : action[4]}
-        data_packet.update(actuation)
+        data_packet["Zone_3"].update(actuation)
         data = json.dumps(data_packet)
         ms.mqtt_publish("Zone3_Data", data)
         sd.store_json(data_packet,file_path)
