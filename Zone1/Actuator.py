@@ -11,38 +11,30 @@ class Window_Servo:
         IO.setmode (IO.BCM)            
         IO.setup(self.port,IO.OUT)            
         self.p = IO.PWM(self.port,50)              
-        self.p.start(1.5)
+        #self.p.start(1.5)
         #self.p.ChangeDutyCycle(3)
     def actuate(self, window_data):
+        self.p.start(1.5)
         if window_data == "windows_closed" :
             self.p.ChangeDutyCycle(1)          # change duty cycle for getting the servo position to 0º
-            time.sleep(1)
-            print("closed")
             #self.p.stop()
             Actuator.buzzer_off(self.buzzer)
         elif window_data == "windows_open" :
             self.p.ChangeDutyCycle(3)
-            time.sleep(1)
             #self.p.stop()  
             Actuator.buzzer_on(self.buzzer)      
         elif window_data == "windows_partially_open" :
             self.p.ChangeDutyCycle(2.5)        # change duty cycle for getting the servo position to 22.5
-            time.sleep(1)
-            print("Mid_Open")
             #self.p.stop()
             Actuator.buzzer_on(self.buzzer)
         elif window_data == "windows_warmup_mode" :
             self.p.ChangeDutyCycle(2)        # change duty cycle for getting the servo position to 22.5º
-            time.sleep(1)
             #self.p.stop()    
             Actuator.buzzer_off(self.buzzer)                 
         else :
             self.p.ChangeDutyCycle(2.5) 
-            time.sleep(1)
             #self.p.stop()
             Actuator.buzzer_off(self.buzzer)
-
-        IO.cleanup()
         
 class Heater_LED:
     def __init__(self,port):
@@ -172,7 +164,7 @@ class Actuator:
                 
             except IOError:				# Print "Error" if communication error encountered
                 print ("Error")
-            time.sleep(1)
+            
             
     def buzzer_on(port):
         grovepi.pinMode(port,"OUTPUT")
@@ -182,7 +174,7 @@ class Actuator:
                 # Buzz for 1 second
                 grovepi.digitalWrite(port,1)
                 
-                time.sleep(1)
+            
                 
         except KeyboardInterrupt:
                 grovepi.digitalWrite(port,0)

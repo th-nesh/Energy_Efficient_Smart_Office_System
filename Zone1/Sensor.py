@@ -37,18 +37,13 @@ class DHT_Sensor:
         self.port = port
     
     def sense(self):
-        blue = 0    # The Blue colored sensor.
-        white = 1   # The White colored sensor.
-
-        while True:
-            try:
-                # This example uses the blue colored sensor. 
-                # The first parameter is the port, the second parameter is the type of sensor.
-                [temp,humidity] = grovepi.dht(self.port,blue)  
-                if math.isnan(temp) == False and math.isnan(humidity) == False:
-                    return(temp, humidity)
-            except IOError:
-                print ("Error")
+        # This example uses the blue colored sensor. 
+        # The first parameter is the port, the second parameter is the type of sensor.
+        [temp,humidity] = grovepi.dht(self.port,0)  
+        if math.isnan(temp) == False and math.isnan(humidity) == False:
+            return(temp, humidity)
+        #except IOError:
+                #print ("Error")
                 
 #Fetch Occupancy Sensor Values
 class Occupancy_Sensor:
@@ -60,22 +55,19 @@ class Occupancy_Sensor:
         motion=0
         grovepi.pinMode(self.port,"INPUT")
 
-        while True:
-            try:
+        
+        
                 # Sense motion, usually human, within the target range
-                motion=grovepi.digitalRead(self.port)
-                if motion==0 or motion==1:	# check if reads were 0 or 1 it can be 255 also because of IO Errors so remove those values
-                    if motion==1:
-                        occ_state = "Occupied"
-                    else:
-                        occ_state = "Un_Occupied"
+        motion=grovepi.digitalRead(self.port)
+        if motion==0 or motion==1:	# check if reads were 0 or 1 it can be 255 also because of IO Errors so remove those values
+            if motion==1:
+                occ_state = "Occupied"
+            else:
+                occ_state = "Un_Occupied"
 
                     # if your hold time is less than this, you might not see as many detections
-                time.sleep(1)
-                return(occ_state)
-
-            except IOError:
-                print ("Error")
+                
+            return(occ_state)
 
 #Fetch Light Intensity Sensor Values
 class Light_Sensor:
@@ -92,18 +84,15 @@ class Light_Sensor:
 
         grovepi.pinMode(self.port,"INPUT")
         
-        while True:
-            try:
+        
                 # Get sensor value
-                sensor_value = grovepi.analogRead(self.port)
+        sensor_value = grovepi.analogRead(self.port)
 
                 # Calculate resistance of sensor in K
-                resistance = (float)(1023 - sensor_value) * 10 / sensor_value
+        resistance = (float)(1023 - sensor_value) * 10 / sensor_value
 
                 #print("sensor_value = %d resistance = %.2f" %(sensor_value,  resistance))
-                time.sleep(1)
-                return (resistance)
+        
+        return (resistance)
 
-            except IOError:
-                print ("Error")
                        

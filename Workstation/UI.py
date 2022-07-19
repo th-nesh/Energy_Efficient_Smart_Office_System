@@ -20,19 +20,16 @@ with open(file_path1, "r") as json_file:
     for line in (json_file.readlines()[-50:]):
         for key, values in json.loads(line).items():
             print(values)
-            #zone1_df = zone1_df.append(values, ignore_index= True)
-# with open(file_path2, "r") as json_file:
-#     for key, values in json.loads(line).items():
-#         for key, values in json.loads(line).items():           
-#             zone2_df = zone2_df.append(values,ignore_index= True)
-# with open(file_path3, "r") as json_file:
-#     for key, values in json.loads(line).items():
-#         for key, values in json.loads(line).items():           
-#             zone3_df = zone3_df.append(values,ignore_index= True)
+            zone1_df = zone1_df.append(values, ignore_index= True)
+with open(file_path2, "r") as json_file:
+    for line in (json_file.readlines()[-50:]):
+        for key, values in json.loads(line).items():           
+            zone2_df = zone2_df.append(values,ignore_index= True)
+with open(file_path3, "r") as json_file:
+    for line in (json_file.readlines()[-50:]):
+        for key, values in json.loads(line).items():           
+            zone3_df = zone3_df.append(values,ignore_index= True)
             
-print(zone1_df)
-print(zone2_df)
-print(zone3_df)
 original_title = '<p style="font-family:Courier; color:White; font-size: 40px;"> Energy Efficient Smart Office</p>'
 st.markdown(original_title, unsafe_allow_html=True)
 zone1_df = zone2_df

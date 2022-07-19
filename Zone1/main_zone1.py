@@ -10,7 +10,7 @@ dht = DHT_Sensor(3)
 occ = Occupancy_Sensor(2)
 lux = Light_Sensor(2)
 sd = data_json()
-ms = MQTT_Communication("Area2")
+ms = MQTT_Communication("Zone_1")
 planner = ai_planner()
 interval = 1
 window = Window_Servo(18,7)
@@ -33,36 +33,36 @@ def heat_index_calc(temp ,humidity):
         heat_index = c1 + (c2*temp) + (c3*humidity) + (c4*temp*humidity) + (c5 * temp**2 ) + (c6*humidity**2) + (c7*temp**2 * humidity)+ (c8 * temp *humidity**2) + (c9*temp**2 * humidity**2 )
         return heat_index
 while True:
-        dt =  datetime.now().strftime("%d-%m-%YT%H:%M:%S") 
-        data_packet = {"Area_2":
+        dt =  datetime.now().strftime("%d-%m-%YT%H:%M:%S")
+        temp,hum = dht.sense()
+        
+        print(temp)
+        data_packet = {"Zone_1":
                 {
          "time_stamp": dt,
-
-         "Zone_Heat_Index ": heat_index_calc(dht.sense()[0],dht.sense()[1]),
+         "Zone_Heat_Index ": heat_index_calc(temp,hum),
          "Zone_Lighting"  : lux.sense(),
          "Zone_Occupancy"  : occ.sense(),
          "Zone_CO2"  : co2.sense(),
-         "Zone_Temperature" : dht.sense()[0],
-         "Zone_Humidity"  : dht.sense()[1],
+         "Zone_Temperature" : temp,
+         "Zone_Humidity"  : hum,
             
         }
         }
         print(data_packet)
 
         action = planner.ai_planning(data_packet)
-        print(action)
+        actuation= {"Light": action [0], "Blind": action [1], "Window": action[2], "Heater": action [3], "AC" : action[4]}
+        data_packet["Zone_1"].update(actuation)
+        data = json.dumps(data_packet)
+        ms.mqtt_publish("Zone1_Data", data)
         light.actuate(action[0])
         blind.actuate(action[1])
         window.actuate(action[2])
-        print("window actuated")
         heater.actuate(action[3])
         ac.actuate(action[4])
-        actuation= {"Light": action [0], "Blind": action [1], "Window": action[2], "Heater": action [3], "AC" : action[4]}
-        data_packet.update(actuation)
-        data = json.dumps(data_packet)
-        ms.mqtt_publish("Zone1_Data", data)
         sd.store_json(data_packet,file_path)
-        time.sleep(interval)
+        
         
 
 

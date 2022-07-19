@@ -33,7 +33,7 @@ class ai_planner:
         
     def context_generator(self, data):
         input = []
-        data_x = data["Area_2"]
+        data_x = data["Zone_1"]
         print(data_x)
         for key, value in data_x.items():
             

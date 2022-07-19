@@ -6,8 +6,8 @@
 (:init
     (Is_Un_Occupied occ_val)
     (Is_Temp_High temp_val)
-    (Is_CO2_critical c_val )
-    (Is_Light_Bright l_val )
+    (Is_CO2_normal c_val )
+    (Is_Light_Normal l_val )
 )
 
 (:goal (and(or 
