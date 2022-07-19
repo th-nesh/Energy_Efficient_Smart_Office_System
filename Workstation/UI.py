@@ -10,75 +10,29 @@ import matplotlib.pyplot as plt
 import plotly.figure_factory as ff
 
 import paho.mqtt.client as mqtt
-
-MQTT_SERVER = "192.168.0.121"
-Zone1_MQTT_PATH = "Zone1_data"
-Zone2_MQTT_PATH = "Zone2_data"
-Zone3_MQTT_PATH = "Zone3_data"
-file_path1 = "/Users/thinesh/Desktop/University/3. Summer 2022/Smart Cities and IoT/Project/Smart_Cities Code/Zone1 Data.json"
-file_path2 = "/Users/thinesh/Desktop/University/3. Summer 2022/Smart Cities and IoT/Project/Smart_Cities Code/Zone2 Data.json"
-file_path3 = "/Users/thinesh/Desktop/University/3. Summer 2022/Smart Cities and IoT/Project/Smart_Cities Code/Zone3 Data.json"
-# The callback for when the client receives a CONNACK response from the server.
-def on_connect(client, userdata, flags, rc):
-    print("Connected with result code "+str(rc))
-
-    # Subscribing in on_connect() means that if we lose the connection and
-    # reconnect then subscriptions will be renewed.
-    client.subscribe(Zone1_MQTT_PATH)
-    client.subscribe(Zone2_MQTT_PATH)
-    client.subscribe(Zone3_MQTT_PATH)
-
-# The callback for when a PUBLISH message is received from the server.
-def on_message(client, userdata, msg):
-    if msg.topic == "Zone1_data":
-        print(msg.topic+" "+str(msg.payload))
-        receive_decode = str(msg.payload.decode("utf-8","ignore"))
-            # more callbacks, etc
-        receive = json.loads(receive_decode)
-        
-        with open(file_path1, "a+") as json_file:
-            json.dump(receive,json_file)
-            json_file.write("/n") 
-    elif msg.topic == "Zone2_data":
-        print(msg.topic+" "+str(msg.payload))
-        receive_decode = str(msg.payload.decode("utf-8","ignore"))
-            # more callbacks, etc
-        receive = json.loads(receive_decode)
-        with open(file_path2, "a+") as json_file:
-            json.dump(receive,json_file)
-            json_file.write("/n") 
-    elif msg.topic == "Zone3_data":
-        print(msg.topic+" "+str(msg.payload))
-        receive_decode = str(msg.payload.decode("utf-8","ignore"))
-            # more callbacks, etc
-        receive = json.loads(receive_decode)
-        
-        with open(file_path3, "a+") as json_file:
-            json.dump(receive,json_file)
-            json_file.write("/n") 
-    client = mqtt.Client()
-    client.on_connect = on_connect
-    client.on_message = on_message
-
-    client.connect(MQTT_SERVER, 1883, 60)
-    client.loop_forever()
-
-file_path = "/Users/thinesh/Desktop/University/3. Summer 2022/Smart Cities and IoT/Project/Smart_Cities Code/sensor_data.json"
+file_path1 = "/Users/thinesh/Desktop/University/3. Summer 2022/Smart Cities and IoT/Project/Smart_Cities Code/Workstation/Zone1 Data.json"
+file_path2 = "/Users/thinesh/Desktop/University/3. Summer 2022/Smart Cities and IoT/Project/Smart_Cities Code/Workstation/Zone2 Data.json"
+file_path3 = "/Users/thinesh/Desktop/University/3. Summer 2022/Smart Cities and IoT/Project/Smart_Cities Code/Workstation/Zone3 Data.json"
 zone1_df = pd.DataFrame()
 zone2_df = pd.DataFrame()
 zone3_df = pd.DataFrame()
 with open(file_path1, "r") as json_file:
-    for line in json_file.readlines():
+    for line in (json_file.readlines()[-50:]):
         for key, values in json.loads(line).items():
-            zone1_df = zone1_df.append(values, ignore_index= True)
-with open(file_path2, "r") as json_file:
-    for line in json_file.readlines():
-        for key, values in json.loads(line).items():           
-            zone2_df = zone2_df.append(values,ignore_index= True)
-with open(file_path3, "r") as json_file:
-    for line in json_file.readlines():
-        for key, values in json.loads(line).items():           
-            zone3_df = zone3_df.append(values,ignore_index= True)
+            print(values)
+            #zone1_df = zone1_df.append(values, ignore_index= True)
+# with open(file_path2, "r") as json_file:
+#     for key, values in json.loads(line).items():
+#         for key, values in json.loads(line).items():           
+#             zone2_df = zone2_df.append(values,ignore_index= True)
+# with open(file_path3, "r") as json_file:
+#     for key, values in json.loads(line).items():
+#         for key, values in json.loads(line).items():           
+#             zone3_df = zone3_df.append(values,ignore_index= True)
+            
+print(zone1_df)
+print(zone2_df)
+print(zone3_df)
 original_title = '<p style="font-family:Courier; color:White; font-size: 40px;"> Energy Efficient Smart Office</p>'
 st.markdown(original_title, unsafe_allow_html=True)
 zone1_df = zone2_df
