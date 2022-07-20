@@ -18,6 +18,7 @@
     (Is_CO2_critical ?cc)         ;true iff CO2 level is critical.
     (Is_CO2_sub_critical ?cs);true iff CO2 level is sub-critical.
     (Is_CO2_normal ?cn)           ;true iff CO2 level is normal.
+    (Is_Warmup_Mode ?warm)        ;true iff Warmup Mode is enabled.
     (AC_On ?ao)                   ;true iff AC is ON.
     (AC_Off ?aof)                 ;true iff AC is OFF.
     (Window_Open ?wo)             ;true iff Window is fully opened.
@@ -26,11 +27,16 @@
     (Heating_High ?hh)            ;true iff Heating control is kept High.
     (Heating_Medium ?hm)          ;true iff Heating control is kept Medium.
     (Heating_Off ?ho)             ;true iff Heating control is Off.
-    (Blind_Open ?bo)                ;true iff Window Blind is fully opened.
-    (Blind_Mid_Open ?bmo)           ;true iff Window Blind is partially opened. 
-    (Blind_Closed ?bc)              ;true iff Window Blind is Closed.
+    (Blind_Open ?bo)              ;true iff Window Blind is fully opened.
+    (Blind_Partially_Open ?bmo)   ;true iff Window Blind is partially opened. 
+    (Blind_Closed ?bc)            ;true iff Window Blind is Closed.
     (Lights_On ?lo)               ;true iff Lights are ON.
     (Lights_Off ?lof)             ;true iff Lights are OFF.
+    (AC_Warmup ?awarm)            ;true iff AC is in Warmup Mode
+    (Heating_Warmup ?hwarm)       ;true iff Heater is in Warmup mode.
+    (Window_Warmup ?wwarm)        ;true iff Window is in Warmup mode.
+    (Lighting_Warmup ?lwarm)        ;true iff Window is in Warmup mode.
+    (Blind_Warmup ?bwarm)        ;true iff Window is in Warmup mode.
 
     )
 
@@ -71,6 +77,7 @@
     :effect (Heating_Off ?h)
 )
 
+
 ;define actions here
 (:action Windows_Open
     :parameters (?w ?o ?cc)
@@ -90,6 +97,7 @@
     :effect (Window_Mid_Open ?w)
 )
 
+
 ;define actions here
 (:action Windows_Closed
     :parameters (?w ?o ?cn )
@@ -107,9 +115,16 @@
 (:action Blinds_Open
     :parameters (?b ?o ?l)
     :precondition 
-        (and (or (Is_Light_Gloomy ?l ) (Is_Light_Normal ?l) ) (Is_Occupied ?o))
-       
+        (and (Is_Light_Gloomy ?l ) (Is_Occupied ?o))
     :effect (Blind_Open ?b)
+)
+
+;define actions here
+(:action Blinds_Partially_Open
+    :parameters (?b ?o ?l)
+    :precondition 
+        (and (Is_Light_Normal ?l)(Is_Occupied ?o))
+    :effect (Blind_Partially_Open ?b)
 )
 
 ;define actions here
@@ -139,5 +154,50 @@
        
     :effect (Lights_Off ?l)
 )
+
+;define actions here
+(:action Windows_Warmup_Mode
+    :parameters (?w ?warm ?l ?b ?a)
+    :precondition 
+        (Is_Warmup_Mode ?warm)
+       
+    :effect (Window_Warmup ?w)
+)
+;define actions here
+(:action AC_Warmup_Mode
+    :parameters (?a ?warm)
+    :precondition 
+        (Is_Warmup_Mode ?warm)
+       
+    :effect (AC_Warmup ?a)
+)
+    
+;define actions here
+(:action Heating_Warmup_Mode
+    :parameters (?h ?warm)
+    :precondition 
+        (Is_Warmup_Mode ?warm)
+       
+    :effect (Heating_Warmup ?h)
+)
+
+;define actions here
+(:action Blind_Warmup_Mode
+    :parameters (?b ?warm)
+    :precondition 
+        (Is_Warmup_Mode ?warm)
+       
+    :effect (Blind_Warmup ?b)
+)
+
+;define actions here
+(:action Light_Warmup_Mode
+    :parameters (?l ?warm)
+    :precondition 
+        (Is_Warmup_Mode ?warm)
+       
+    :effect (Lighting_Warmup ?l)
+)
+
 
 )

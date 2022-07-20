@@ -17,23 +17,23 @@ class Window_Servo:
         self.p.start(1.5)
         if window_data == "windows_closed" :
             self.p.ChangeDutyCycle(1)          # change duty cycle for getting the servo position to 0º
-            #self.p.stop()
+            
             Actuator.buzzer_off(self.buzzer)
         elif window_data == "windows_open" :
             self.p.ChangeDutyCycle(3)
-            #self.p.stop()  
+              
             Actuator.buzzer_on(self.buzzer)      
         elif window_data == "windows_partially_open" :
             self.p.ChangeDutyCycle(2.5)        # change duty cycle for getting the servo position to 22.5
-            #self.p.stop()
+            
             Actuator.buzzer_on(self.buzzer)
         elif window_data == "windows_warmup_mode" :
             self.p.ChangeDutyCycle(2)        # change duty cycle for getting the servo position to 22.5º
-            #self.p.stop()    
+              
             Actuator.buzzer_off(self.buzzer)                 
         else :
             self.p.ChangeDutyCycle(2.5) 
-            #self.p.stop()
+            
             Actuator.buzzer_off(self.buzzer)
         
 class Heater_LED:
@@ -49,7 +49,7 @@ class Heater_LED:
         elif heater_data == "heating_to_off" :
             Actuator.led_OFF(self.port)
         elif heater_data == "heating_warmup_mode" :
-            Actuator.led_OFF(self.port)                  
+            Actuator.led_blink(self.port)                  
         else :
             Actuator.led_OFF(self.port) 
 
@@ -76,7 +76,7 @@ class Light_LED:
                     Actuator.led_ON(self.port)
                 
                 elif Light_data == "lights_off" :
-                    Actuator.led_fade(self.port)
+                    Actuator.led_blink(self.port)
                     
                 else :
                     Actuator.led_OFF(self.port)

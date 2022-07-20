@@ -20,7 +20,10 @@ interval = 2
 # ac = AC_LED(4)
 # light = Light_LED(8)
 # blind = Blind_LED(5)
-file_path = "/Users/thinesh/Desktop/University/3. Summer 2022/Smart Cities and IoT/Project/Smart_Cities Code/Zone3/Zone3_data.json"
+file_path = "D:\SS22\SmartCity\https---github.com-th-nesh-Energy_Efficient_Smart_Office_System\Zone3\Zone3_data.json"
+WC_path = "D:\SS22\SmartCity\https---github.com-th-nesh-Energy_Efficient_Smart_Office_System\Zone3\WC_Mode.json"
+MQTT_SERVER = "192.168.0.121"
+MQTT_PATH = "Zone_Override"
 
 def heat_index_calc(temp ,humidity):
         c1 = -8.784
@@ -50,8 +53,22 @@ while True:
         }
         }
         print(data_packet)
-
-        action = planner.ai_planning(data_packet)
+        with open(WC_path, "r") as json_file:
+            for key, values in json.loads(json_file.readlines()[-1]).items():
+                    a = values
+        if a == "(Is_Warmup_Mode occ_val)":
+                inp = [a, '', '','']
+                mode = "WC"
+               
+        else:
+                inp = planner.context_generator(data_packet)
+                mode = ""
+               
+        action = planner.ai_planning(inp)
+        if mode == "WC":
+            actuation= {"Light": action [0], "Blind": action [1], "Window": action[4], "Heater": action [2],"AC" : action[3]}
+        else:
+            actuation= {"Light": action [0], "Blind": action [1], "Window": action[2], "Heater": action[3], "AC": action[4]}
         print(action)
         # light.actuate(action[0])
         # blind.actuate(action[1])
@@ -59,7 +76,7 @@ while True:
         # print("window actuated")
         # heater.actuate(action[3])
         # ac.actuate(action[4])
-        actuation= {"Light": action [0], "Blind": action [1], "Window": action[2], "Heater": action [3], "AC" : action[4]}
+       
         data_packet["Zone_3"].update(actuation)
         data = json.dumps(data_packet)
         ms.mqtt_publish("Zone3_Data", data)

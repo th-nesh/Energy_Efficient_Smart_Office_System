@@ -52,10 +52,9 @@ class ai_planner:
             
     # def context_parser(self):
         
-    def ai_planning(self, data):
+    def ai_planning(self, input):
             action = []
-            input= self.context_generator(data)
-            print(input)
+            #input= self.context_generator(data)
             out = """(define (problem tempsense) (:domain covisstorage)
 
         (:objects 
@@ -77,21 +76,27 @@ class ai_planner:
             out+= """(:goal (and(or 
                     (Heating_Off heat_val)
                     (Heating_High heat_val)
-                    (Heating_Medium heat_val))
+                    (Heating_Medium heat_val)
+                    (Heating_Warmup heat_val))
                     (or
                     (AC_On ac_val)
-                    (AC_Off ac_val))
+                    (AC_Off ac_val)
+                    (AC_Warmup ac_val))
                     (or
                     (Window_Closed w_val)
                     (Window_Open w_val)
                     (Window_Mid_Open w_val)
+                    (Window_Warmup w_val)
                     )
                     (or
                     (Blind_Closed blind_val)
-                    (Blind_Open blind_val))
+                    (Blind_Open blind_val)
+                    (Blind_Partially_Open blind_val)
+                    (Blind_Warmup blind_val))
                     (or
                     (Lights_On l_val)
-                    (Lights_Off l_val))
+                    (Lights_Off l_val)
+                    (Lighting_Warmup l_val))
                 )
 
                 )

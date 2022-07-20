@@ -5,7 +5,7 @@ class ai_planner:
     def CO2_parser(self,x):
         if x>1000:
             return "(Is_CO2_critical c_val)"
-        elif x>500 and x<1000:
+        elif x>850 and x<1000:
             return "(Is_CO2_sub_critical c_val)"
         else:
             return "(Is_CO2_normal c_val)"
@@ -33,7 +33,7 @@ class ai_planner:
         
     def context_generator(self, data):
         input = []
-        data_x = data["Area_2"]
+        data_x = data["Zone_2"]
         print(data_x)
         for key, value in data_x.items():
             
@@ -52,9 +52,9 @@ class ai_planner:
             
     # def context_parser(self):
         
-    def ai_planning(self, data):
+    def ai_planning(self,input):
             action = []
-            input= self.context_generator(data)
+            
             print(input)
             out = """(define (problem tempsense) (:domain covisstorage)
 
@@ -77,21 +77,27 @@ class ai_planner:
             out+= """(:goal (and(or 
                     (Heating_Off heat_val)
                     (Heating_High heat_val)
-                    (Heating_Medium heat_val))
+                    (Heating_Medium heat_val)
+                    (Heating_Warmup heat_val))
                     (or
                     (AC_On ac_val)
-                    (AC_Off ac_val))
+                    (AC_Off ac_val)
+                    (AC_Warmup ac_val))
                     (or
                     (Window_Closed w_val)
                     (Window_Open w_val)
                     (Window_Mid_Open w_val)
+                    (Window_Warmup w_val)
                     )
                     (or
                     (Blind_Closed blind_val)
-                    (Blind_Open blind_val))
+                    (Blind_Open blind_val)
+                    (Blind_Partially_Open blind_val)
+                    (Blind_Warmup blind_val))
                     (or
                     (Lights_On l_val)
-                    (Lights_Off l_val))
+                    (Lights_Off l_val)
+                    (Lighting_Warmup l_val))
                 )
 
                 )
@@ -103,13 +109,13 @@ class ai_planner:
             with open(filename, "w") as f:
                 f.write(out)
                 
-            domainfile = r"/home/pi/smart_office/officedomain.pddl"
+            domainfile = r"/home/pi/smart_office/Zone2/officedomain.pddl"
             problemfile = r"/home/pi/smart_office/officeproblem.pddl"
             data = {'domain': open(domainfile, 'r').read(),
                         'problem': open(filename, 'r').read()}
 
             response = requests.post('http://solver.planning.domains/solve', json=data).json()
-
+            
             for i in range(5):
                 action.append(response["result"]["plan"][i]["name"].split()[0][1:])
                 

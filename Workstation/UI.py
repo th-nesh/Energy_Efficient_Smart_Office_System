@@ -2,7 +2,7 @@ import streamlit as st
 import base64
 import pandas as pd
 import json
-import requests 
+from Data_Processor import *
 import plotly.express as px
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import plotly.figure_factory as ff
 from streamlit_autorefresh import st_autorefresh
 
-count = st_autorefresh(interval=2000, limit=100, key="fizzbuzzcounter")
+count = st_autorefresh(interval=2000, limit=1000, key="fizzbuzzcounter")
 file_path1 = "/Users/thinesh/Desktop/University/3. Summer 2022/Smart Cities and IoT/Project/Smart_Cities Code/Workstation/Zone1 Data.json"
 file_path2 = "/Users/thinesh/Desktop/University/3. Summer 2022/Smart Cities and IoT/Project/Smart_Cities Code/Workstation/Zone2 Data.json"
 file_path3 = "/Users/thinesh/Desktop/University/3. Summer 2022/Smart Cities and IoT/Project/Smart_Cities Code/Workstation/Zone3 Data.json"
@@ -37,10 +37,6 @@ def data_header(df):
     st.header('Data from the Zone')
     st.write(df)
 
-def warmup_mode(data):
-    
-    count = 0
-    print(count)
     
 def displaymetric(df):
     st.header('Zone Metrics')
@@ -64,8 +60,22 @@ def interactive_plot(df):
         st.plotly_chart(plot)
 
 col1, col2 = st.columns(2)
-col1.button("Warm-up Mode", key="212",help = "Select to activate Warm-up Mode", on_click= warmup_mode("wc"))
-col2.button("Disable Warm-up Mode", key="121",help = "Select to de-activate Warm-up Mode", on_click= warmup_mode("dwc"))
+st.header('Zone Data Analysis')
+wc_mode = col1.selectbox('Warm-up Mode:', ['Disable', 'Enable'])
+ms = MQTT_Communication("UI")
+try :
+    if wc_mode == "Enable":
+        data_packet = {"WC_Mode" : "(Is_Warmup_Mode occ_val)"}
+        data = json.dumps(data_packet)
+        ms.mqtt_publish("Zone_Override", data = data)
+    elif wc_mode =="Disable":
+        data_packet = {"WC_Mode" : "null"}
+        data = json.dumps(data_packet)
+        ms.mqtt_publish("Zone_Override", data = data)
+except ValueError:
+    print("error")
+
+#col2.button("Disable Warm-up Mode", key="121",help = "Select to de-activate Warm-up Mode", on_click= warmup_mode("dwc"))
 col1, col2,col3 = st.columns(3)
 options = col1.selectbox('Select Zone:', ['Zone 1', 'Zone 2', 'Zone 3'])
 x_axis_val = zone1_df["time_stamp"]
@@ -74,16 +84,16 @@ y_axis_sense_val = col3.selectbox('Select the sensor', options=zone1_df.columns[
 if options == "Zone 1":
     displaymetric(zone1_df)
     interactive_plot(zone1_df)
-    data_header(zone1_df)
+    data_header(zone1_df[::-1])
       
 elif options == "Zone 2":
     displaymetric(zone2_df)
     interactive_plot(zone2_df)
-    data_header(zone2_df)
+    data_header(zone2_df[::-1])
 else:
     displaymetric(zone3_df)
     interactive_plot(zone3_df)
-    data_header(zone3_df)
+    data_header(zone3_df[::-1])
     
 
 
